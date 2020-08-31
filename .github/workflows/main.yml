@@ -10,10 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-      - uses: actions/checkout@v2
+      - uses:actions/checkout@v2
 
-      - name: Build
-        run: dotnet build $GITHUB_WORKSPACE/src/screen-time-tracker-react-app
+      - name:Build
+        run:dotnet build $GITHUB_WORKSPACE/src/screen-time-tracker-react-app
 
-      - name: Build
-        run: dotnet test $GITHUB_WORKSPACE/src/screen-time-tracker-api-tests
+      - name:Build
+        run:dotnet test $GITHUB_WORKSPACE/src/screen-time-tracker-api-tests
