@@ -123,4 +123,3 @@ C:\git\screen-time-tracker\src\screen-time-tracker-api-tests\obj\Debug\netcoreap
 C:\git\screen-time-tracker\src\screen-time-tracker-api-tests\obj\Debug\netcoreapp3.1\screen-time-tracker-api-tests.genruntimeconfig.cache
 C:\git\screen-time-tracker\src\screen-time-tracker-api-tests\bin\Debug\netcoreapp3.1\Castle.Core.dll
 C:\git\screen-time-tracker\src\screen-time-tracker-api-tests\bin\Debug\netcoreapp3.1\NSubstitute.dll
-C:\git\screen-time-tracker\src\screen-time-tracker-api-tests\bin\Debug\netcoreapp3.1\PeopleFile.csv

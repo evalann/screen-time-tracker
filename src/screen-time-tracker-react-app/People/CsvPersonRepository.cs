@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace screen_time_tracker_react_app.People
 {
@@ -14,12 +15,13 @@ namespace screen_time_tracker_react_app.People
 
         public Task AddPerson(Person person)
         {
-            throw new System.NotImplementedException();
+            File.AppendAllLines(_filePath, new string [1] {person.Name});
+            return Task.CompletedTask;
         }
 
         public Task<IEnumerable<Person>> GetPeople()
         {
-            var csv = System.IO.File.ReadAllLines(_filePath);
+            var csv = File.ReadAllLines(_filePath);
             var people = new List<Person>(csv.Length);
 
             foreach(var line in csv)
