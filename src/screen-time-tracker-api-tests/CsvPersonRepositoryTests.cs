@@ -11,14 +11,13 @@ namespace screen_time_tracker_api_tests
     [TestFixture]
     public class CsvPersonRepositoryTests
     {
-        private string _filePath;
+        private const string FilePath = "People.csv";
         private string[] _defaultContents = new string[] {"Evalan Naidu", "Wade Wilson", "Logan", "Peter Parker"};
 
         [SetUp]
         public void SetUp()
         {
-            _filePath = "PeopleFile.csv";
-            File.WriteAllLines(_filePath, _defaultContents);
+            File.WriteAllLines(FilePath, _defaultContents);
         }
 
         [Test]
@@ -32,7 +31,7 @@ namespace screen_time_tracker_api_tests
         [Test]
         public void GetPeople_GivenNoFile_ShouldThrowFileNotFoundException()
         {
-            _filePath = "NonExistentFile.csv";
+            DeleteFileIfExists();
             var sut = CreateSut();
 
             Assert.ThrowsAsync<FileNotFoundException>(() => sut.GetPeople());
@@ -54,13 +53,12 @@ namespace screen_time_tracker_api_tests
         public async Task AddPerson_GivenCsvFileDoesNotExist_ShouldCreateAndAddPerson()
         {
             const string expected = "Evalan Naidu";
-            _filePath = "NewFile.csv";
-            if(File.Exists(_filePath)) File.Delete(_filePath);
+            DeleteFileIfExists();
             var sut = CreateSut();
 
             await sut.AddPerson(new Person(expected));
 
-            var lines = File.ReadAllLines(_filePath);
+            var lines = File.ReadAllLines(FilePath);
             Assert.That(lines, Contains.Item(expected));
         }
 
@@ -68,20 +66,20 @@ namespace screen_time_tracker_api_tests
         public async Task AddPerson_GivenFileAlreadyHasContents_ShouldAppendNewPersonToEnd()
         {
             var expected = "Mary Jane Watson";
-            var fileContentsBefore = File.ReadAllLines(_filePath);
+            var fileContentsBefore = File.ReadAllLines(FilePath);
             Assert.That(fileContentsBefore, Does.Not.Contain(expected));
             var sut = CreateSut();
 
             await sut.AddPerson(new Person(expected));
 
-            var fileContentsAfter = File.ReadAllLines(_filePath);
+            var fileContentsAfter = File.ReadAllLines(FilePath);
             Assert.That(fileContentsAfter, Contains.Item(expected));
             AssertDefaultPeopleAreIn(fileContentsAfter);
         }
 
         private CsvPersonRepository CreateSut()
         {
-            return new CsvPersonRepository(_filePath);
+            return new CsvPersonRepository();
         }
 
         private void AssertDefaultPeopleAreIn(List<Person> people)
@@ -98,6 +96,11 @@ namespace screen_time_tracker_api_tests
             {
                 Assert.That(people[i], Is.EqualTo(_defaultContents[i]));
             }
+        }
+
+        private static void DeleteFileIfExists()
+        {
+            if (File.Exists(FilePath)) File.Delete(FilePath);
         }
     }
 }

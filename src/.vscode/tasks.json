@@ -37,6 +37,15 @@
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "type": "npm",
+            "script": "test -- --watch",
+            "path": "screen-time-tracker-react-app/ClientApp/",
+            "group": "test",
+            "problemMatcher": [],
+            "label": "npm: test - screen-time-tracker-react-app/ClientApp",
+            "detail": "cross-env CI=true react-scripts test --env=jsdom"
         }
     ]
 }

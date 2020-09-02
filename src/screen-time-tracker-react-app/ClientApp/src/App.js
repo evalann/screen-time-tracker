@@ -6,7 +6,8 @@ import { FetchData } from './components/FetchData';
 import { Counter } from './components/Counter';
 import { People } from './components/People';
 
-import './custom.css'
+import 'react-datasheet/lib/react-datasheet.css';
+import './custom.css';
 
 export default class App extends Component {
   static displayName = App.name;
