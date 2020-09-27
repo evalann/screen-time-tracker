@@ -45,7 +45,7 @@ namespace screen_time_tracker_api_tests
         [Test]
         public async Task GetPeople_GivenPersonRepositoryReturnsPeople_ShouldReturnOkWithBodyPopulated()
         {
-            var expected = new List<Person> {new Person("Evalan Naidu"), new Person("Wade Wilson")};
+            var expected = new List<Person> {new Person("Evalan Naidu", new DateTime(1988, 09, 02)), new Person("Wade Wilson", new DateTime(1950, 08, 16))};
             _personRepository.GetPeople().Returns(expected);
             var sut = CreateSut();
             
@@ -69,7 +69,7 @@ namespace screen_time_tracker_api_tests
         [Test]
         public async Task AddPerson_GivenPerson_ShouldAddAndReturnOk()
         {
-            var person = new Person("Deadpool");
+            var person = new Person("Deadpool", new DateTime(1950, 12, 01));
             var sut = CreateSut();
 
             var act = await sut.AddPerson(person);

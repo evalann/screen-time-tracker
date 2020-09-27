@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
+using System;
 
 namespace screen_time_tracker_react_app.People
 {
@@ -10,7 +11,7 @@ namespace screen_time_tracker_react_app.People
 
         public Task AddPerson(Person person)
         {
-            File.AppendAllLines(FilePath, new string [1] {person.Name});
+            File.AppendAllLines(FilePath, new string [1] {$"{person.Name},{person.DateOfBirth}"});
             return Task.CompletedTask;
         }
 
@@ -21,7 +22,9 @@ namespace screen_time_tracker_react_app.People
 
             foreach(var line in csv)
             {
-                people.Add(new Person(line));
+                var split = line.Split(',');
+                var dob = DateTime.Parse(split[1]);
+                people.Add(new Person(split[0], dob));
             }
 
             return Task.FromResult<IEnumerable<Person>>(people);

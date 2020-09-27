@@ -5,13 +5,19 @@ export class People extends Component {
     constructor(props) {
         super(props);
         // todo: Populate from the api, if no values then show an empty grid.
-        this.state = {
+        this.state = { 
             peopleGrid: [
-                [{ value: "Name", readOnly: true }, { value: "Date of Birth", readOnly: true }],
-                [{ value: "Evalan" }, { value: "1988/09/02" }],
-                [{ value: "" }, { value: "" }]
-            ]
+                [{ value: "Name", readOnly: true }, { value: "Date of Birth", readOnly: true }]
+            ], 
+            loading: true 
         };
+        // this.state = {
+        //     peopleGrid: [
+        //         [{ value: "Name", readOnly: true }, { value: "Date of Birth", readOnly: true }],
+        //         [{ value: "Evalan" }, { value: "1988/09/02" }],
+        //         [{ value: "" }, { value: "" }]
+        //     ]
+        // };
     }
 
     onContextMenu = (e, cell, i, j) => cell.readOnly ? e.preventDefault() : null;
