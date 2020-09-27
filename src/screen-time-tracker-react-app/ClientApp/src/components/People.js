@@ -20,6 +20,10 @@ export class People extends Component {
         // };
     }
 
+    componentDidMount() {
+      this.populatePeopleData();
+    }
+
     onContextMenu = (e, cell, i, j) => cell.readOnly ? e.preventDefault() : null;
 
     onCellsChanged = (changes) => {
@@ -33,6 +37,14 @@ export class People extends Component {
     }
 
     render() {
+        let contents = this.state.loading 
+        ? <p><em>Loading...</em></p> 
+        : People.renderPeopleGrid(this.state.peopleGrid);
+
+        return contents;
+    }
+
+    renderPeopleGrid() {
         return (
             <div>
                 <h1>People</h1>
@@ -46,5 +58,12 @@ export class People extends Component {
                 </div>
             </div>
         );
+    }
+
+    async populatePeopleData() {
+      const response = await fetch('people');
+      const data = await response.json();
+      console.log(data);
+      this.setState({ peopleGrid: data, loading: false });
     }
 }

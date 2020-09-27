@@ -17,6 +17,7 @@ namespace screen_time_tracker_react_app.People
 
         public Task<IEnumerable<Person>> GetPeople()
         {
+            if(!File.Exists(FilePath)) File.WriteAllLines(FilePath, new List<string> {$"Evalan Naidu,{new DateTime(1988, 09, 02)}"});
             var csv = File.ReadAllLines(FilePath);
             var people = new List<Person>(csv.Length);
 

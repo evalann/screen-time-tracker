@@ -30,12 +30,14 @@ namespace screen_time_tracker_api_tests
         }
 
         [Test]
-        public void GetPeople_GivenNoFile_ShouldThrowFileNotFoundException()
+        public async Task GetPeople_GivenNoFile_ShouldCreateFileWithDefaultPerson()
         {
             DeleteFileIfExists();
             var sut = CreateSut();
 
-            Assert.ThrowsAsync<FileNotFoundException>(() => sut.GetPeople());
+            var act = await sut.GetPeople();
+
+            Assert.That(act.Count(), Is.EqualTo(1));
         }
 
         [Test]
