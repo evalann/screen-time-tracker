@@ -14,7 +14,7 @@ The technologies being used are:
 ### Admin
 * The user should be able to configure **People** for screen time tracking records.
 ### Capture
-* The user should be able to select one or more children from the list.
+* The user should be able to select one or more people from the list.
 * The user should be able to select a category of screen time to capture.
 * The user should be able to select/enter a specific name for the content.
 * The user should be able to input a numeric value in either minutes or hours. 
