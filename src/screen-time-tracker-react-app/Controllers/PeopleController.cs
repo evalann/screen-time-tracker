@@ -21,12 +21,13 @@ namespace screen_time_tracker_react_app.Controllers
             return Ok(await _personRepository.GetPeople());
         }
 
+        [HttpPost]
         public async Task<IActionResult> AddPerson(Person person)
         {
             if(person == null) return BadRequest("Person was not provided.");
             
-            await _personRepository.AddPerson(person);
-            return Ok();
+            var result = await _personRepository.AddPerson(person);
+            return Ok(result);
         }
     }
 }

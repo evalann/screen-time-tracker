@@ -6,7 +6,7 @@ export class People extends Component {
         super(props);
         this.state = { 
             peopleGrid: [
-                [{ value: "Name", readOnly: true }, { value: "Date of Birth", readOnly: true }]
+                [{ value: "Id", readOnly: true }, { value: "Name", readOnly: true }, { value: "Date of Birth", readOnly: true }]
             ], 
             loading: true 
         };
@@ -14,16 +14,6 @@ export class People extends Component {
 
     componentDidMount() {
       this.populatePeopleData();
-    }
-
-    onContextMenu = (e, cell, i, j) => cell.readOnly ? e.preventDefault() : null;
-
-    onCellsChanged = (changes) => {
-        const peopleGrid = this.state.peopleGrid.map(row => [...row]);
-        changes.forEach(({cell, row, col, value}) => {
-            peopleGrid[row][col] = { ...peopleGrid[row][col], value };
-        });
-        this.setState({ peopleGrid });
     }
 
     render() {
@@ -45,9 +35,59 @@ export class People extends Component {
                         onContextMenu={this.onContextMenu}
                         onCellsChanged={this.onCellsChanged}
                     />
+                    <button className="add-button" onClick={this.addRow}>+</button>
                 </div>
             </div>
         );
+    }
+
+    onContextMenu = (e, cell, i, j) => cell.readOnly ? e.preventDefault() : null;
+
+    onCellsChanged = (changes) => {
+        const peopleGrid = this.state.peopleGrid.map(row => [...row]);
+        changes.forEach(({cell, row, col, value}) => {
+            peopleGrid[row][col] = { ...peopleGrid[row][col], value };
+            this.addOrUpdatePerson(peopleGrid[row]);
+        });
+        this.setState({ peopleGrid });
+    }
+
+    async addOrUpdatePerson(row) {
+        let id = row[0].value;
+        let name = row[1].value;
+        let dob = row[2].value;
+        
+        // currently we only support adding people, but will support updates in the future
+        if(!this.validateRow(id, name, dob)) return;
+        
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, dateOfBirth: dob })
+        };
+        const response = await fetch('people', requestOptions);
+        const data = await response.json();
+        console.log(data);
+    }
+
+    validateRow = (id, name, dob) => {
+        if(id !== "") return false;
+        if(name.trim() === "" || dob.trim() === "") return false;
+
+        return true;
+    } 
+
+    addRow = () => {
+        const peopleGrid = this.state.peopleGrid.map(row => [...row]);
+        let newRow = [{value: "", readOnly: true}, {value: ""}, {value: ""}];
+
+        if(!this.lastRowIsIncomplete(peopleGrid)) peopleGrid.push(newRow);
+
+        this.setState({peopleGrid: peopleGrid, loading: false});
+    }
+
+    lastRowIsIncomplete(peopleGrid) {
+        return peopleGrid[peopleGrid.length - 1][1].value.trim() === "" || peopleGrid[peopleGrid.length - 1][2].value.trim() === "";
     }
 
     async populatePeopleData() {
@@ -55,11 +95,11 @@ export class People extends Component {
       const data = await response.json();
       
       let tempGrid = [
-        [{value: "Name", readOnly: true}, {value: "Date of Birth", readOnly: true}]
+        [{value: "Id", readOnly: true}, {value: "Name", readOnly: true}, {value: "Date of Birth", readOnly: true}]
       ];
       
-      data.forEach(({name, dateOfBirth}) => {
-        let gridRow = [{value: name}, {value: dateOfBirth}];
+      data.forEach(({id, name, dateOfBirth}) => {
+        let gridRow = [{value: id, readOnly: true}, {value: name}, {value: dateOfBirth}];
         tempGrid.push(gridRow);
       });
 

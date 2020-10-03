@@ -45,7 +45,7 @@ namespace screen_time_tracker_api_tests
         [Test]
         public async Task GetPeople_GivenPersonRepositoryReturnsPeople_ShouldReturnOkWithBodyPopulated()
         {
-            var expected = new List<Person> {new Person("Evalan Naidu", new DateTime(1988, 09, 02)), new Person("Wade Wilson", new DateTime(1950, 08, 16))};
+            var expected = new List<Person> {new Person(1, "Evalan Naidu", new DateTime(1988, 09, 02)), new Person(2, "Wade Wilson", new DateTime(1950, 08, 16))};
             _personRepository.GetPeople().Returns(expected);
             var sut = CreateSut();
             
@@ -67,15 +67,18 @@ namespace screen_time_tracker_api_tests
         }
 
         [Test]
-        public async Task AddPerson_GivenPerson_ShouldAddAndReturnOk()
+        public async Task AddPerson_GivenPerson_ShouldAddAndReturnOkWithPersonInResponse()
         {
-            var person = new Person("Deadpool", new DateTime(1950, 12, 01));
+            var person = new Person(null, "Deadpool", new DateTime(1950, 12, 01));
+            var expected = new Person(1, person.Name, person.DateOfBirth);
+            _personRepository.AddPerson(person).Returns(expected);
             var sut = CreateSut();
 
             var act = await sut.AddPerson(person);
 
-            Assert.That(act, Is.InstanceOf<OkResult>());
-            await _personRepository.Received(1).AddPerson(person);
+            Assert.That(act, Is.InstanceOf<OkObjectResult>());
+            var actualPerson = ((OkObjectResult)act).Value;
+            Assert.That(actualPerson, Is.EqualTo(expected));
         }
 
         [Test]
