@@ -8,7 +8,7 @@ using screen_time_tracker_react_app.People;
 
 namespace screen_time_tracker_api_tests
 {
-    //[Explicit("These are integration tests that will write to a csv file.")]
+    [Explicit("These are integration tests that will write to a csv file.")]
     [TestFixture]
     public class CsvPersonRepositoryTests
     {
