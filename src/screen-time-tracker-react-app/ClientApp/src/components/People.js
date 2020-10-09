@@ -1,25 +1,26 @@
 import React, { Component } from 'react';
 import DataSheet from 'react-datasheet';
+import DateTimePicker from 'react-datetime-picker';
 
 export class People extends Component {
     constructor(props) {
         super(props);
-        this.state = { 
+        this.state = {
             peopleGrid: [
                 [{ value: "Id", readOnly: true }, { value: "Name", readOnly: true }, { value: "Date of Birth", readOnly: true }]
-            ], 
-            loading: true 
+            ],
+            loading: true
         };
     }
 
     componentDidMount() {
-      this.populatePeopleData();
+        this.populatePeopleData();
     }
 
     render() {
-        let contents = this.state.loading 
-        ? <p><em>Loading...</em></p> 
-        : this.renderPeopleGrid(this.state.peopleGrid);
+        let contents = this.state.loading
+            ? <p><em>Loading...</em></p>
+            : this.renderPeopleGrid(this.state.peopleGrid);
 
         return contents;
     }
@@ -45,7 +46,7 @@ export class People extends Component {
 
     onCellsChanged = (changes) => {
         const peopleGrid = this.state.peopleGrid.map(row => [...row]);
-        changes.forEach(({cell, row, col, value}) => {
+        changes.forEach(({ cell, row, col, value }) => {
             peopleGrid[row][col] = { ...peopleGrid[row][col], value };
             this.addOrUpdatePerson(peopleGrid[row]);
         });
@@ -56,10 +57,10 @@ export class People extends Component {
         let id = row[0].value;
         let name = row[1].value;
         let dob = row[2].value;
-        
+
         // currently we only support adding people, but will support updates in the future
-        if(!this.validateRow(id, name, dob)) return;
-        
+        if (!this.validateRow(id, name, dob)) return;
+
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -71,19 +72,19 @@ export class People extends Component {
     }
 
     validateRow = (id, name, dob) => {
-        if(id !== "") return false;
-        if(name.trim() === "" || dob.trim() === "") return false;
+        if (id !== "") return false;
+        if (name.trim() === "" || dob.trim() === "") return false;
 
         return true;
-    } 
+    }
 
     addRow = () => {
         const peopleGrid = this.state.peopleGrid.map(row => [...row]);
-        let newRow = [{value: "", readOnly: true}, {value: ""}, {value: ""}];
+        let newRow = [{ value: "", readOnly: true }, { value: "" }, { value: "" }];
 
-        if(!this.lastRowIsIncomplete(peopleGrid)) peopleGrid.push(newRow);
+        if (!this.lastRowIsIncomplete(peopleGrid)) peopleGrid.push(newRow);
 
-        this.setState({peopleGrid: peopleGrid, loading: false});
+        this.setState({ peopleGrid: peopleGrid, loading: false });
     }
 
     lastRowIsIncomplete(peopleGrid) {
@@ -91,18 +92,26 @@ export class People extends Component {
     }
 
     async populatePeopleData() {
-      const response = await fetch('people');
-      const data = await response.json();
-      
-      let tempGrid = [
-        [{value: "Id", readOnly: true}, {value: "Name", readOnly: true}, {value: "Date of Birth", readOnly: true}]
-      ];
-      
-      data.forEach(({id, name, dateOfBirth}) => {
-        let gridRow = [{value: id, readOnly: true}, {value: name}, {value: dateOfBirth}];
-        tempGrid.push(gridRow);
-      });
+        const response = await fetch('people');
+        const data = await response.json();
 
-      this.setState({ peopleGrid: tempGrid, loading: false });
+        let tempGrid = [
+            [{ value: "Id", readOnly: true }, { value: "Name", readOnly: true }, { value: "Date of Birth", readOnly: true }]
+        ];
+
+        const component = (id) => {
+            
+            //todo: Get this thing working for the change functionality. Sample: https://github.com/nadbm/react-datasheet/blob/master/docs/src/examples/ComponentSheet.js
+            return (
+                <DateTimePicker format="dd-MMM-y" value={new Date(data[id-1].dateOfBirth)} />
+            )
+        }
+
+        data.forEach(({ id, name, dateOfBirth }) => {
+            let gridRow = [{ value: id, readOnly: true }, { value: name }, { value: dateOfBirth, component: component(id), forceComponent: true }];
+            tempGrid.push(gridRow);
+        });
+
+        this.setState({ peopleGrid: tempGrid, loading: false });
     }
 }
