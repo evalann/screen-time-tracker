@@ -77,8 +77,9 @@ export class People extends Component {
             body: JSON.stringify({ name: name, dateOfBirth: dob })
         };
         const response = await fetch('people', requestOptions);
-        const data = await response.json();
-        // todo: Error handling
+        await response.json();
+        // todo: Error handling and replace latest row with a disabled row
+        // todo: there's a bug with the date picker on change when selecting values on the default calendar pop up.
     }
 
     validateRow = (id, name, dob) => {
