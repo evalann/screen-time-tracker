@@ -3,6 +3,9 @@ import DataSheet from 'react-datasheet';
 import DateTimePicker from 'react-datetime-picker';
 import _ from 'lodash'
 
+const idColIndex = 0;
+const nameColIndex = 1;
+const dateOfBirthColIndex = 2;
 export class People extends Component {
     constructor(props) {
         super(props);
@@ -48,16 +51,22 @@ export class People extends Component {
     onCellsChanged = (changes) => {
         const peopleGrid = this.state.peopleGrid.map(row => [...row]);
         changes.forEach(({ cell, row, col, value }) => {
+            // For the date changes we need to use the cell value because the DatePicker's change of value doesn't seem to get to this callback.
+            if (this.isDateOfBirthChange(col)) value = new Date(cell.value);
             peopleGrid[row][col] = { ...peopleGrid[row][col], value };
             this.addOrUpdatePerson(peopleGrid[row]);
         });
         this.setState({ peopleGrid });
     }
 
+    isDateOfBirthChange(col) {
+        return col === dateOfBirthColIndex;
+    }
+
     async addOrUpdatePerson(row) {
-        let id = row[0].value;
-        let name = row[1].value;
-        let dob = row[2].value;
+        let id = row[idColIndex].value;
+        let name = row[nameColIndex].value;
+        let dob = row[dateOfBirthColIndex].value;
 
         // currently we only support adding people, but will support updates in the future
         if (!this.validateRow(id, name, dob)) return;
@@ -69,12 +78,12 @@ export class People extends Component {
         };
         const response = await fetch('people', requestOptions);
         const data = await response.json();
-        console.log(data);
+        // todo: Error handling
     }
 
     validateRow = (id, name, dob) => {
         if (id !== "") return false;
-        if (name.trim() === "" || dob.trim() === "") return false;
+        if (name.trim() === "" || dob === null) return false;
 
         return true;
     }
@@ -89,18 +98,25 @@ export class People extends Component {
     }
 
     lastRowIsIncomplete(peopleGrid) {
-        return peopleGrid[peopleGrid.length - 1][1].value.trim() === "" || peopleGrid[peopleGrid.length - 1][2].value.trim() === "";
+        return peopleGrid[peopleGrid.length - 1][nameColIndex].value.trim() === "" || peopleGrid[peopleGrid.length - 1][dateOfBirthColIndex].value === null;
     }
-   
-    dateOfBirthCol = (id, dateOfBirth) => {
-        const dateOfBirthComponent = (id, dateOfBirth) => {
-            //todo: Get this thing working for the change functionality. Sample: https://github.com/nadbm/react-datasheet/blob/master/docs/src/examples/ComponentSheet.js
+
+    dateOfBirthCol = (index, dateOfBirth, readOnly) => {
+        const dateOfBirthOnChange = (index, value) => {
+            if(value == null) return;
+            const peopleGrid = this.state.peopleGrid.map(row => [...row]);
+            readOnly = this.validateRow(peopleGrid[index]);
+            peopleGrid[index][dateOfBirthColIndex] = this.dateOfBirthCol(index, new Date(value).toUTCString(), true);
+            this.setState({ peopleGrid: peopleGrid, loading: false });
+        }
+
+        const dateOfBirthComponent = (index, dateOfBirth, readOnly) => {
             return (
-                <DateTimePicker format="dd-MMM-y" value={new Date(dateOfBirth)} />
+                <DateTimePicker disabled={readOnly} format="dd-MMM-y" value={new Date(dateOfBirth)} onChange={(value) => dateOfBirthOnChange(index, value)} />
             )
         }
 
-        return {value: dateOfBirth, component: dateOfBirthComponent(id, dateOfBirth), forceComponent: true}
+        return { value: dateOfBirth, component: dateOfBirthComponent(index, dateOfBirth, readOnly), forceComponent: true }
     }
 
     async populatePeopleData() {
@@ -111,7 +127,10 @@ export class People extends Component {
             [{ value: "Id", readOnly: true }, { value: "Name", readOnly: true }, { value: "Date of Birth", readOnly: true }]
         ];
 
-        tempGrid = tempGrid.concat(_.range(0, data.length).map(index => [{readOnly: true, value: data[index].id}, {value: data[index].name}, this.dateOfBirthCol(index, data[index].dateOfBirth)]));
+        tempGrid = tempGrid.concat(_.range(1, data.length + 1).map(gridIndex => {
+            const dataIndex = gridIndex - 1;
+            return [{ readOnly: true, value: data[dataIndex].id }, { value: data[dataIndex].name }, this.dateOfBirthCol(gridIndex, data[dataIndex].dateOfBirth, true)];
+        }));
 
         this.setState({ peopleGrid: tempGrid, loading: false });
     }
