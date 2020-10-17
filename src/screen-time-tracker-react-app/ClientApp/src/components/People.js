@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import DataSheet from 'react-datasheet';
 import DateTimePicker from 'react-datetime-picker';
+import dateformat from 'dateformat';
 import _ from 'lodash'
 
 const idColIndex = 0;
@@ -56,7 +57,7 @@ export class People extends Component {
             peopleGrid[row][col] = { ...peopleGrid[row][col], value };
             this.addOrUpdatePerson(peopleGrid[row]);
         });
-        this.setState({ peopleGrid });
+        this.setState({ peopleGrid: peopleGrid, loading: false });
     }
 
     isDateOfBirthChange(col) {
@@ -70,7 +71,7 @@ export class People extends Component {
 
         // currently we only support adding people, but will support updates in the future
         if (!this.validateRow(id, name, dob)) return;
-
+        
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -85,7 +86,7 @@ export class People extends Component {
     validateRow = (id, name, dob) => {
         if (id !== "") return false;
         if (name.trim() === "" || dob === null) return false;
-
+        
         return true;
     }
 
@@ -104,10 +105,11 @@ export class People extends Component {
 
     dateOfBirthCol = (index, dateOfBirth, readOnly) => {
         const dateOfBirthOnChange = (index, value) => {
-            if(value == null) return;
+            if (value == null) return;
+            value = dateformat(value, "isoUtcDateTime");
             const peopleGrid = this.state.peopleGrid.map(row => [...row]);
             readOnly = this.validateRow(peopleGrid[index]);
-            peopleGrid[index][dateOfBirthColIndex] = this.dateOfBirthCol(index, new Date(value).toUTCString(), true);
+            peopleGrid[index][dateOfBirthColIndex] = this.dateOfBirthCol(index, value, readOnly);
             this.setState({ peopleGrid: peopleGrid, loading: false });
         }
 
